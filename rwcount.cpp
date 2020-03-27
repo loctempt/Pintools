@@ -18,7 +18,6 @@
 #include <unordered_map>
 #include <cstring>
 #include "pin.H"
-// #include "types_vmapi.H"
 using std::cerr;
 using std::dec;
 using std::endl;
@@ -33,8 +32,7 @@ using std::time;
 using std::unordered_map;
 using std::vector;
 
-ofstream mapFile; //MapFile;
-// vector<char *> imageNames;
+ofstream mapFile;
 vector<ofstream *> funcOutFiles, instOutFiles;
 unordered_map<string, int> image2idx;
 string prevFunc;
@@ -58,8 +56,6 @@ VOID printTimestamp(ofstream *ofs)
 //============================================
 //      Begining of instruction operations
 //============================================
-// This function is called before every instruction is executed
-
 VOID recordWriteIns(ADDRINT ptr, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
@@ -76,9 +72,6 @@ VOID recordReadIns(ADDRINT ptr, int fileIdx)
 
 VOID printIns(ADDRINT val, int fileIdx)
 {
-    // PIN_REGISTER reg_val;
-    // PIN_GetContextRegval(ctxt, REG_RAX, reinterpret_cast<UINT8 *>(&reg_val));
-    // UINT64 val = reinterpret_cast<UINT64>(reg_val.qword);
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
                                << "   returns: " << val << endl;
@@ -99,13 +92,6 @@ VOID MallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT size)
     returnAddress = returnAddr;
 }
 
-// VOID MallocAfter(CHAR *name, CHAR *imgName, ADDRINT ret)
-// {
-//     funcOutFile << hex << showbase
-//                 << "\t" << name << "  returns " << ret
-//                 << "\t\t" << imgName << endl;
-// }
-
 VOID CallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT nmemb, ADDRINT size)
 {
     printTimestamp(funcOutFiles[fileIdx]);
@@ -115,11 +101,6 @@ VOID CallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT nmemb, AD
     returnAddress = returnAddr;
 }
 
-// VOID CallocAfter(CHAR *name, CHAR *imgName, ADDRINT ret)
-// {
-//     MallocAfter(name, imgName, ret);
-// }
-
 VOID ReallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT ptr, ADDRINT size)
 {
     printTimestamp(funcOutFiles[fileIdx]);
@@ -128,11 +109,6 @@ VOID ReallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT ptr, ADD
                                << endl;
     returnAddress = returnAddr;
 }
-
-// VOID ReallocAfter(CHAR *name, CHAR *imgName, ADDRINT ret)
-// {
-//     MallocAfter(name, imgName, ret);
-// }
 
 VOID FreeBefore(CHAR *name, int fileIdx, ADDRINT ptr)
 {
@@ -145,6 +121,8 @@ VOID FreeBefore(CHAR *name, int fileIdx, ADDRINT ptr)
 // Pin calls this function every time a new instruction is encountered
 VOID Instruction(INS ins, VOID *v)
 {
+    // Insert a call at function return point, getting
+    // the function's return value by reading EAX/RAX.
     RTN rtn = INS_Rtn(ins);
     if (!RTN_Valid(rtn))
         return;
@@ -158,9 +136,6 @@ VOID Instruction(INS ins, VOID *v)
     if (image2idx.count(imgName) == 0)
         return;
     int fileIdx = image2idx[imgName];
-    // cerr << " file idx = " << fileIdx << endl;
-    // Insert a call at function return point, getting
-    // the function's return value by reading EAX/RAX.
     if (INS_Address(ins) == returnAddress)
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)printIns,
 #ifdef __i386__
@@ -191,7 +166,6 @@ VOID Instruction(INS ins, VOID *v)
 
 VOID instFunc(IMG &img, SYM &sym, string &funcName)
 {
-    // char *imgName = imageNames[imgNameIdx];
     int fileIdx = image2idx[IMG_Name(img)];
     RTN funcRtn = RTN_FindByAddress(IMG_LowAddress(img) + SYM_Value(sym));
     if (!RTN_Valid(funcRtn))
@@ -207,10 +181,6 @@ VOID instFunc(IMG &img, SYM &sym, string &funcName)
                        IARG_RETURN_IP,
                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
                        IARG_END);
-        // RTN_InsertCall(funcRtn, IPOINT_AFTER, (AFUNPTR)MallocAfter,
-        //                IARG_ADDRINT, MALLOC,
-        //                IARG_ADDRINT, imgName,
-        //                IARG_FUNCRET_EXITPOINT_VALUE, IARG_END);
     }
     else if (funcName == CALLOC)
     {
@@ -221,10 +191,6 @@ VOID instFunc(IMG &img, SYM &sym, string &funcName)
                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
                        IARG_FUNCARG_ENTRYPOINT_VALUE, 1,
                        IARG_END);
-        // RTN_InsertCall(funcRtn, IPOINT_AFTER, (AFUNPTR)CallocAfter,
-        //                IARG_ADDRINT, CALLOC,
-        //                IARG_ADDRINT, imgName,
-        //                IARG_FUNCRET_EXITPOINT_VALUE, IARG_END);
     }
     else if (funcName == REALLOC)
     {
@@ -235,10 +201,6 @@ VOID instFunc(IMG &img, SYM &sym, string &funcName)
                        IARG_FUNCARG_ENTRYPOINT_VALUE, 0,
                        IARG_FUNCARG_ENTRYPOINT_VALUE, 1,
                        IARG_END);
-        // RTN_InsertCall(funcRtn, IPOINT_AFTER, (AFUNPTR)ReallocAfter,
-        //                IARG_ADDRINT, REALLOC,
-        //                IARG_ADDRINT, imgName,
-        //                IARG_FUNCRET_EXITPOINT_VALUE, IARG_END);
     }
     else if (funcName == FREE)
     {
@@ -249,32 +211,6 @@ VOID instFunc(IMG &img, SYM &sym, string &funcName)
                        IARG_END);
     }
     RTN_Close(funcRtn);
-    // RTN mallocRtn = RTN_FindByName(img, MALLOC);
-    // RTN callocRtn = RTN_FindByName(img, CALLOC);
-    // RTN reallocRtn = RTN_FindByName(img, REALLOC);
-    // if (RTN_Valid(mallocRtn))
-    // {
-    //     RTN_Open(mallocRtn);
-
-    //     // Instrument malloc() to print the input argument value and the return value.
-    //     RTN_Close(mallocRtn);
-    // }
-
-    // if (RTN_Valid(callocRtn))
-    // {
-    //     RTN_Open(callocRtn);
-
-    //     RTN_Close(callocRtn);
-    // }
-
-    // Find the free() function.
-    // RTN freeRtn = RTN_FindByName(img, FREE);
-    // if (RTN_Valid(freeRtn))
-    // {
-    //     RTN_Open(freeRtn);
-    //     // Instrument free() to print the input argument value.
-    //     RTN_Close(freeRtn);
-    // }
 }
 
 VOID Image(IMG img, VOID *v)
@@ -295,22 +231,12 @@ VOID Image(IMG img, VOID *v)
     image2idx[IMG_Name(img)] = outFileIndex++;
     cerr << IMG_Name(img) << endl;
 
-    // if (IMG_Name(img) != "/lib/x86_64-linux-gnu/libc.so.6")
-    // if (IMG_Name(img) != "/root/jxy/villoc/a.out")
-    // return;
-    // char *buf = new char[256];
-    // strncpy(buf, IMG_Name(img).c_str(), 255);
-    // imageNames.push_back(buf);
-
     for (SYM sym = IMG_RegsymHead(img); SYM_Valid(sym); sym = SYM_Next(sym))
     {
         string undecorateFuncName = PIN_UndecorateSymbolName(SYM_Name(sym),
                                                              UNDECORATION_NAME_ONLY);
-        // cerr << undecorateFuncName << endl;
         instFunc(img, sym, undecorateFuncName);
     }
-
-    // outFileIndex++;
 }
 
 KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool",
@@ -319,16 +245,6 @@ KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE, "pintool",
 // This function is called when the application exits
 VOID Fini(INT32 code, VOID *v)
 {
-    // Write to a file since cout and cerr maybe closed by the application
-    // OutFile.setf(ios::showbase);
-    // OutFile << "Count " << icount << endl;
-    // OutFile.close();
-    // for (int i = 0; i < outFileIndex; i++)
-    // {
-    //     (OutFiles[i])->close();
-    //     delete OutFiles[i];
-    // }
-    // MapFile.close();
     mapFile.close();
     for (int i = 0; i < outFileIndex; i++)
     {
@@ -364,11 +280,8 @@ int main(int argc, char *argv[])
         return Usage();
 
     mapFile.open("out.map");
-    // OutFile.open(KnobOutputFile.Value().c_str());
-    // MapFile.open("out.map");
 
     // Register Instruction to be called to instrument instructions
-    // INS_AddInstrumentFunction(Instruction, 0);
     IMG_AddInstrumentFunction(Image, 0);
 
     INS_AddInstrumentFunction(Instruction, 0);
