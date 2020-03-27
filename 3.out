@@ -1,0 +1,9 @@
+malloc(0x64)		
+calloc(0xc8, 0x1)		
+  calloc  returns 0x555758afd2d0
+realloc(0, 0x12c)		
+malloc(0x12c)		
+  malloc  returns 0x555758afd3a0
+malloc(0x400)		
+  malloc  returns 0x555758afd4e0
+free(0x555758afd260)		

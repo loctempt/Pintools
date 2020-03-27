@@ -1,0 +1,3 @@
+Pin: pin-3.11-97998-7ecce2dac
+Copyright 2002-2019 Intel Corporation.
+E:  rwcount.cpp:170: Cannot use IARG_MEMORYREAD_EA for ins without memory read (     2 0x00007f042673c093 call 0x7f042673cea0)

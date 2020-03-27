@@ -1,0 +1,15 @@
+0          malloc(0x8)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x563493581260
+1          malloc(0x10)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x563493581280
+2          malloc(0x20)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x5634935812a0
+3          malloc(0x400)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x5634935812d0
+4          calloc(0xc8, 0x1)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x5634935816e0
+5          realloc(0, 0x12c)		/lib/x86_64-linux-gnu/libc.so.6
+6          malloc(0x12c)		/lib/x86_64-linux-gnu/libc.so.6
+   returns: 0x5634935817b0
+7          free(0x563493581260)		/lib/x86_64-linux-gnu/libc.so.6
+8          free(0x563493581260)		/lib/x86_64-linux-gnu/libc.so.6

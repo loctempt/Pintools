@@ -1,0 +1,44 @@
+malloc(0x591)
+  returns 0x7f489399b170
+malloc(0x491)
+  returns 0x7f489399b710
+malloc(0x10)
+  returns 0x7f489399bbb0
+malloc(0x9d)
+  returns 0x7f489399bbc0
+malloc(0x28)
+  returns 0x7f489399bc60
+malloc(0x140)
+  returns 0x7f489399bc90
+malloc(0x20)
+  returns 0x7f489399bdd0
+malloc(0x49a)
+  returns 0x7f487f306000
+malloc(0x20)
+  returns 0x7f487f3064a0
+malloc(0x28)
+  returns 0x7f487f3064c0
+malloc(0x38)
+  returns 0x7f487f3064f0
+malloc(0x48)
+  returns 0x7f487f306530
+malloc(0x48)
+  returns 0x7f487f306580
+malloc(0x300)
+  returns 0x7f487f3065d0
+malloc(0x90)
+  returns 0x7f487f3068d0
+malloc(0x410)
+  returns 0x7f487f306960
+malloc(0x1088)
+  returns 0x7f487f306d70
+malloc(0x110)
+  returns 0x7f487f307e00
+free(0)
+malloc(0x64)
+malloc(0x12c)
+  returns 0x55e1b1d8f3a0
+malloc(0x400)
+  returns 0x55e1b1d8f4e0
+free(0x55e1b1d8f260)
+free(0x55e1b1d8f260)

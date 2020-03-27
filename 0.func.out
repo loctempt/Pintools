@@ -1,0 +1,12 @@
+34701      malloc(0x8)
+50211        returns: 0x5567ba903260
+50214      malloc(0x10)
+50281        returns: 0x5567ba903280
+50284      malloc(0x20)
+50351        returns: 0x5567ba9032a0
+50868      calloc(0xc8, 0x1)
+50957        returns: 0x5567ba9036e0
+50962      realloc(0, 0x12c)
+51061        returns: 0x5567ba9037b0
+51065      free(0x5567ba903260)
+51100      free(0x5567ba903260)
