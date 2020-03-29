@@ -1,72 +1,72 @@
-3315       calloc(0x591, 0x1)
-3317       calloc(0x591, 0x1)
-3318       malloc(0x591)
-3320       malloc(0x591)
-3328         returns: 0x7f484cff5170
-3609       calloc(0x491, 0x1)
-3611       calloc(0x491, 0x1)
-3612       malloc(0x491)
-3614       malloc(0x491)
-3621         returns: 0x7f484cff5710
-3785       malloc(0x10)
-3787       malloc(0x10)
-3794         returns: 0x7f484cff5bb0
-3946       malloc(0x9d)
-3948       malloc(0x9d)
-3955         returns: 0x7f484cff5bc0
-4101       malloc(0x28)
-4103       malloc(0x28)
-4110         returns: 0x7f484cff5c60
-4116       malloc(0x140)
-4118       malloc(0x140)
-4125         returns: 0x7f484cff5c90
-4791       malloc(0x20)
-4793       malloc(0x20)
-4800         returns: 0x7f484cff5dd0
-4965       calloc(0x49a, 0x1)
-4967       calloc(0x49a, 0x1)
-4968       malloc(0x49a)
-4970       malloc(0x49a)
-4998         returns: 0x7f4838951000
-5042       malloc(0x20)
-5044       malloc(0x20)
-5051         returns: 0x7f48389514a0
-5831       malloc(0x28)
-5833       malloc(0x28)
-5840         returns: 0x7f48389514c0
-5889       malloc(0x38)
-5891       malloc(0x38)
-5898         returns: 0x7f48389514f0
-6227       calloc(0x3, 0x18)
-6229       calloc(0x3, 0x18)
-6230       malloc(0x48)
-6232       malloc(0x48)
-6239         returns: 0x7f4838951530
-6302       calloc(0x3, 0x18)
-6304       calloc(0x3, 0x18)
-6305       malloc(0x48)
-6307       malloc(0x48)
-6314         returns: 0x7f4838951580
-6654       calloc(0x20, 0x18)
-6656       calloc(0x20, 0x18)
-6657       malloc(0x300)
-6659       malloc(0x300)
-6666         returns: 0x7f48389515d0
-7001       calloc(0x6, 0x18)
-7003       calloc(0x6, 0x18)
-7004       malloc(0x90)
-7006       malloc(0x90)
-7013         returns: 0x7f48389518d0
-7092       calloc(0x410, 0x1)
-7094       calloc(0x410, 0x1)
-7095       malloc(0x410)
-7097       malloc(0x410)
-7104         returns: 0x7f4838951960
-7150       malloc(0x1088)
-7152       malloc(0x1088)
-7159         returns: 0x7f4838951d70
-7452       calloc(0x11, 0x10)
-7454       calloc(0x11, 0x10)
-7455       malloc(0x110)
-7457       malloc(0x110)
-7464         returns: 0x7f4838952e00
+3205       calloc(0x591, 0x1)
+3207       calloc(0x591, 0x1)
+3208       malloc(0x591)
+3210       malloc(0x591)
+3218         returns: 0x7f91ad4da170
+3499       calloc(0x491, 0x1)
+3501       calloc(0x491, 0x1)
+3502       malloc(0x491)
+3504       malloc(0x491)
+3511         returns: 0x7f91ad4da710
+3675       malloc(0x10)
+3677       malloc(0x10)
+3684         returns: 0x7f91ad4dabb0
+3836       malloc(0x9d)
+3838       malloc(0x9d)
+3845         returns: 0x7f91ad4dabc0
+3991       malloc(0x28)
+3993       malloc(0x28)
+4000         returns: 0x7f91ad4dac60
+4006       malloc(0x140)
+4008       malloc(0x140)
+4015         returns: 0x7f91ad4dac90
+4683       malloc(0x20)
+4685       malloc(0x20)
+4692         returns: 0x7f91ad4dadd0
+4857       calloc(0x49a, 0x1)
+4859       calloc(0x49a, 0x1)
+4860       malloc(0x49a)
+4862       malloc(0x49a)
+4890         returns: 0x7f9198e5b000
+4934       malloc(0x20)
+4936       malloc(0x20)
+4943         returns: 0x7f9198e5b4a0
+5723       malloc(0x28)
+5725       malloc(0x28)
+5732         returns: 0x7f9198e5b4c0
+5781       malloc(0x38)
+5783       malloc(0x38)
+5790         returns: 0x7f9198e5b4f0
+6119       calloc(0x3, 0x18)
+6121       calloc(0x3, 0x18)
+6122       malloc(0x48)
+6124       malloc(0x48)
+6131         returns: 0x7f9198e5b530
+6194       calloc(0x3, 0x18)
+6196       calloc(0x3, 0x18)
+6197       malloc(0x48)
+6199       malloc(0x48)
+6206         returns: 0x7f9198e5b580
+6546       calloc(0x20, 0x18)
+6548       calloc(0x20, 0x18)
+6549       malloc(0x300)
+6551       malloc(0x300)
+6558         returns: 0x7f9198e5b5d0
+6893       calloc(0x6, 0x18)
+6895       calloc(0x6, 0x18)
+6896       malloc(0x90)
+6898       malloc(0x90)
+6905         returns: 0x7f9198e5b8d0
+6984       calloc(0x410, 0x1)
+6986       calloc(0x410, 0x1)
+6987       malloc(0x410)
+6989       malloc(0x410)
+6996         returns: 0x7f9198e5b960
+7042       malloc(0x1088)
+7044       malloc(0x1088)
+7051         returns: 0x7f9198e5bd70
+7344       calloc(0x11, 0x10)
+7346       calloc(0x11, 0x10)
+7347       malloc(0x110)
+7349       malloc(0x110)
+7356         returns: 0x7f9198e5ce00

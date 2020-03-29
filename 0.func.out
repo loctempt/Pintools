@@ -1,12 +1,14 @@
-34701      malloc(0x8)
-50211        returns: 0x5567ba903260
-50214      malloc(0x10)
-50281        returns: 0x5567ba903280
-50284      malloc(0x20)
-50351        returns: 0x5567ba9032a0
-50868      calloc(0xc8, 0x1)
-50957        returns: 0x5567ba9036e0
-50962      realloc(0, 0x12c)
-51061        returns: 0x5567ba9037b0
-51065      free(0x5567ba903260)
-51100      free(0x5567ba903260)
+34594      calloc(0x40, 0x1)
+50115        returns: 0x55e9f59a0260
+50118      malloc(0x8)
+50185        returns: 0x55e9f59a02b0
+50188      malloc(0x10)
+50255        returns: 0x55e9f59a02d0
+50258      malloc(0x20)
+50325        returns: 0x55e9f59a02f0
+50706      calloc(0xc8, 0x1)
+50791        returns: 0x55e9f59a0730
+50796      realloc(0, 0x12c)
+50895        returns: 0x55e9f59a0800
+50899      free(0x55e9f59a02b0)
+50934      free(0x55e9f59a02b0)
