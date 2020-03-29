@@ -1,7 +1,7 @@
 # Pintools
 
 ## 摘要
-基于malloctrace和一些其他例程，编写了对于\*alloc函数和free函数，以及R/W指令的tracer——rwcount.cpp *（后续改名）*
+基于malloctrace和一些其他例程，编写了对于\*alloc函数和free函数，以及R/W指令的tracer——talloc(trace \*alloc)
 
 ## 功能
 - 按目标程序的image分类，追踪其调用的\*alloc和free函数，将参数和返回值写入文件。
