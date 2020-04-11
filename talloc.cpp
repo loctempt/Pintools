@@ -56,25 +56,25 @@ VOID printTimestamp(ofstream *ofs)
 //============================================
 //      Begining of instruction operations
 //============================================
-VOID recordWriteIns(ADDRINT ptr, int fileIdx)
+VOID recordWriteIns(ADDRINT ptr, UINT32 size, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "w @ " << ptr << endl;
+                               << "w @ " << ptr << " " << size << endl;
 }
 
-VOID recordReadIns(ADDRINT ptr, int fileIdx)
+VOID recordReadIns(ADDRINT ptr, UINT32 size, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "r @ " << ptr << endl;
+                               << "r @ " << ptr << " " << size << endl;
 }
 
 VOID printIns(ADDRINT val, int fileIdx)
 {
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
-                               << "   returns: " << val << endl;
+                               << "returns: " << val << endl;
 }
 //============================================
 //      End of instruction operations
@@ -87,7 +87,7 @@ VOID MallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT size)
 {
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
-                               << " " << name << "(" << size << ")"
+                               << name << "(" << size << ")"
                                << endl;
     returnAddress = returnAddr;
 }
@@ -96,7 +96,7 @@ VOID CallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT nmemb, AD
 {
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
-                               << " " << name << "(" << nmemb << ", " << size << ")"
+                               << name << "(" << nmemb << ", " << size << ")"
                                << endl;
     returnAddress = returnAddr;
 }
@@ -105,7 +105,7 @@ VOID ReallocBefore(CHAR *name, int fileIdx, ADDRINT returnAddr, ADDRINT ptr, ADD
 {
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
-                               << " " << name << "(" << ptr << ", " << size << ")"
+                               << name << "(" << ptr << ", " << size << ")"
                                << endl;
     returnAddress = returnAddr;
 }
@@ -152,6 +152,7 @@ VOID Instruction(INS ins, VOID *v)
     {
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordReadIns,
                        IARG_MEMORYREAD_EA,
+                       IARG_MEMORYREAD_SIZE,
                        IARG_UINT32, fileIdx,
                        IARG_END);
     }
@@ -159,6 +160,7 @@ VOID Instruction(INS ins, VOID *v)
     {
         INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordWriteIns,
                        IARG_MEMORYWRITE_EA,
+                       IARG_MEMORYWRITE_SIZE,
                        IARG_UINT32, fileIdx,
                        IARG_END);
     }
