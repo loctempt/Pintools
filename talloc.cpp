@@ -56,21 +56,21 @@ VOID printTimestamp(ofstream *ofs)
 //============================================
 //      Begining of instruction operations
 //============================================
-VOID recordWriteIns(ADDRINT ptr, UINT32 size, int fileIdx)
+VOID recordWriteIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "w @ " << ptr << " " << size << endl;
+                               << "w @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
 }
 
-VOID recordReadIns(ADDRINT ptr, UINT32 size, int fileIdx)
+VOID recordReadIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "r @ " << ptr << " " << size << endl;
+                               << "r @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
 }
 
-VOID printIns(ADDRINT val, int fileIdx)
+VOID printReturn(ADDRINT val, int fileIdx)
 {
     printTimestamp(funcOutFiles[fileIdx]);
     (*(funcOutFiles[fileIdx])) << hex << showbase
@@ -137,7 +137,7 @@ VOID Instruction(INS ins, VOID *v)
         return;
     int fileIdx = image2idx[imgName];
     if (INS_Address(ins) == returnAddress)
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)printIns,
+        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)printReturn,
 #ifdef __i386__
                        IARG_REG_VALUE, REG_EAX,
 #else
