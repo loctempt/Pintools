@@ -38,6 +38,7 @@ unordered_map<string, int> image2idx;
 string prevFunc;
 int outFileIndex = 0;
 ADDRINT returnAddress = 0;
+char strBuf[1024];
 
 #define MALLOC "malloc"
 #define CALLOC "calloc"
@@ -56,19 +57,19 @@ VOID printTimestamp(ofstream *ofs)
 //============================================
 //      Begining of instruction operations
 //============================================
-VOID recordWriteIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
+VOID recordRWIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "w @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
+                               << prefix << " " << ptr << " " << size << " " << regName << endl;
 }
 
-VOID recordReadIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
-{
-    printTimestamp(instOutFiles[fileIdx]);
-    (*(instOutFiles[fileIdx])) << hex << showbase
-                               << "r @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
-}
+// VOID recordReadIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
+// {
+//     printTimestamp(instOutFiles[fileIdx]);
+//     (*(instOutFiles[fileIdx])) << hex << showbase
+//                                << "r @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
+// }
 
 VOID printReturn(ADDRINT val, int fileIdx)
 {
@@ -150,19 +151,51 @@ VOID Instruction(INS ins, VOID *v)
     // their address are passed.
     if (INS_IsMemoryRead(ins))
     {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordReadIns,
-                       IARG_MEMORYREAD_EA,
-                       IARG_MEMORYREAD_SIZE,
-                       IARG_UINT32, fileIdx,
-                       IARG_END);
+        if (INS_IsMov(ins))
+        {
+            strcpy(strBuf, REG_StringShort(INS_OperandReg(ins, 0)).c_str());
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
+                           IARG_PTR, "r >",
+                           IARG_MEMORYREAD_EA,
+                           IARG_MEMORYREAD_SIZE,
+                           IARG_PTR, strBuf,
+                           IARG_UINT32, fileIdx,
+                           IARG_END);
+        }
+        else
+        {
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
+                           IARG_PTR, "r @",
+                           IARG_MEMORYREAD_EA,
+                           IARG_MEMORYREAD_SIZE,
+                           IARG_PTR, "*invalid*",
+                           IARG_UINT32, fileIdx,
+                           IARG_END);
+        }
     }
     if (INS_IsMemoryWrite(ins))
     {
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordWriteIns,
-                       IARG_MEMORYWRITE_EA,
-                       IARG_MEMORYWRITE_SIZE,
-                       IARG_UINT32, fileIdx,
-                       IARG_END);
+        if (INS_IsMov(ins))
+        {
+            strcpy(strBuf, REG_StringShort(INS_OperandReg(ins, 1)).c_str());
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
+                           IARG_PTR, "w <",
+                           IARG_MEMORYWRITE_EA,
+                           IARG_MEMORYWRITE_SIZE,
+                           IARG_PTR, strBuf,
+                           IARG_UINT32, fileIdx,
+                           IARG_END);
+        }
+        else
+        {
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
+                           IARG_PTR, "w @",
+                           IARG_MEMORYWRITE_EA,
+                           IARG_MEMORYWRITE_SIZE,
+                           IARG_PTR, "*invalid*",
+                           IARG_UINT32, fileIdx,
+                           IARG_END);
+        }
     }
 }
 
