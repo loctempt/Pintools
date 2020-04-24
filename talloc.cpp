@@ -39,6 +39,15 @@ string prevFunc;
 int outFileIndex = 0;
 ADDRINT returnAddress = 0;
 char strBuf[1024];
+struct WriteStash
+{
+    CHAR *prefix;
+    ADDRINT ptr;
+    UINT32 size;
+    CHAR *regName;
+    ADDRINT regVal;
+    int fileIdx;
+} writeStash;
 
 #define MALLOC "malloc"
 #define CALLOC "calloc"
@@ -57,13 +66,33 @@ VOID printTimestamp(ofstream *ofs)
 //============================================
 //      Begining of instruction operations
 //============================================
-VOID recordRWIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, int fileIdx)
+VOID recordRWIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, ADDRINT regVal, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << prefix << " " << ptr << " " << size << " " << regName << endl;
+                               << prefix << " " << ptr << " " << size << " " << regName << " " << regVal << endl;
 }
 
+/**
+ * 由于MEMORY_READ_EA只能在IPOINT_BEFORE获取，所以为了记录
+ * 从内存中读出的值，必须先暂存IPOINT_BEFORE处获取的信息，
+ * 便于在IPOINT_AFTER处记录读出的数值后构造trace输出。
+ */ 
+VOID stashReadIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, int fileIdx)
+{
+    writeStash.prefix = prefix;
+    writeStash.ptr = ptr;
+    writeStash.size = size;
+    writeStash.regName = regName;
+    // writeStash.regVal = regVal;
+    writeStash.fileIdx = fileIdx;
+}
+
+VOID recordReadIns(ADDRINT regVal)
+{
+    recordRWIns(writeStash.prefix, writeStash.ptr, writeStash.size,
+                writeStash.regName, regVal, writeStash.fileIdx);
+}
 // VOID recordReadIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
 // {
 //     printTimestamp(instOutFiles[fileIdx]);
@@ -151,15 +180,20 @@ VOID Instruction(INS ins, VOID *v)
     // their address are passed.
     if (INS_IsMemoryRead(ins))
     {
-        if (INS_IsMov(ins))
+        REG reg = INS_OperandReg(ins, 0);
+        if (INS_IsMov(ins) && REG_valid(reg))
         {
-            strcpy(strBuf, REG_StringShort(INS_OperandReg(ins, 0)).c_str());
-            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
+            strcpy(strBuf, REG_StringShort(reg).c_str());
+            INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)stashReadIns,
                            IARG_PTR, "r >",
                            IARG_MEMORYREAD_EA,
                            IARG_MEMORYREAD_SIZE,
                            IARG_PTR, strBuf,
+                           //    IARG_REG_VALUE, reg,
                            IARG_UINT32, fileIdx,
+                           IARG_END);
+            INS_InsertCall(ins, IPOINT_AFTER, (AFUNPTR)recordReadIns,
+                           IARG_REG_VALUE, reg,
                            IARG_END);
         }
         else
@@ -169,20 +203,23 @@ VOID Instruction(INS ins, VOID *v)
                            IARG_MEMORYREAD_EA,
                            IARG_MEMORYREAD_SIZE,
                            IARG_PTR, "*invalid*",
+                           IARG_ADDRINT, 0,
                            IARG_UINT32, fileIdx,
                            IARG_END);
         }
     }
     if (INS_IsMemoryWrite(ins))
     {
-        if (INS_IsMov(ins))
+        REG reg = INS_OperandReg(ins, 1);
+        if (INS_IsMov(ins) && REG_valid(reg))
         {
-            strcpy(strBuf, REG_StringShort(INS_OperandReg(ins, 1)).c_str());
+            strcpy(strBuf, REG_StringShort(reg).c_str());
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordRWIns,
                            IARG_PTR, "w <",
                            IARG_MEMORYWRITE_EA,
                            IARG_MEMORYWRITE_SIZE,
                            IARG_PTR, strBuf,
+                           IARG_REG_VALUE, reg,
                            IARG_UINT32, fileIdx,
                            IARG_END);
         }
@@ -193,6 +230,7 @@ VOID Instruction(INS ins, VOID *v)
                            IARG_MEMORYWRITE_EA,
                            IARG_MEMORYWRITE_SIZE,
                            IARG_PTR, "*invalid*",
+                           IARG_ADDRINT, 0,
                            IARG_UINT32, fileIdx,
                            IARG_END);
         }
