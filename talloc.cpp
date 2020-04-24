@@ -84,7 +84,6 @@ VOID stashReadIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, int fil
     writeStash.ptr = ptr;
     writeStash.size = size;
     writeStash.regName = regName;
-    // writeStash.regVal = regVal;
     writeStash.fileIdx = fileIdx;
 }
 
@@ -93,12 +92,6 @@ VOID recordReadIns(ADDRINT regVal)
     recordRWIns(writeStash.prefix, writeStash.ptr, writeStash.size,
                 writeStash.regName, regVal, writeStash.fileIdx);
 }
-// VOID recordReadIns(ADDRINT ptr, UINT32 size, BOOL isMov, ADDRINT xaxValue, int fileIdx)
-// {
-//     printTimestamp(instOutFiles[fileIdx]);
-//     (*(instOutFiles[fileIdx])) << hex << showbase
-//                                << "r @ " << ptr << " " << size << " " << isMov << " " << xaxValue << endl;
-// }
 
 VOID printReturn(ADDRINT val, int fileIdx)
 {
@@ -189,7 +182,6 @@ VOID Instruction(INS ins, VOID *v)
                            IARG_MEMORYREAD_EA,
                            IARG_MEMORYREAD_SIZE,
                            IARG_PTR, strBuf,
-                           //    IARG_REG_VALUE, reg,
                            IARG_UINT32, fileIdx,
                            IARG_END);
             INS_InsertCall(ins, IPOINT_AFTER, (AFUNPTR)recordReadIns,
