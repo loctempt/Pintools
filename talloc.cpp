@@ -84,11 +84,11 @@ VOID recordCallIns(CHAR *regName, ADDRINT regVal, int fileIdx)
     // free(regName);
 }
 
-VOID recordMovIns(CHAR *prefix, CHAR *regName0, UINT32 size, CHAR *regName1, ADDRINT regVal, int fileIdx)
+VOID recordMovIns(CHAR *prefix, CHAR *regName0, CHAR *regName1, ADDRINT regVal, int fileIdx)
 {
     printTimestamp(instOutFiles[fileIdx]);
     (*(instOutFiles[fileIdx])) << hex << showbase
-                               << prefix << " " << regName0 << " " << size << " " << regName1 << " " << regVal << endl;
+                               << prefix << " " << regName0 << " " << regName1 << " " << regVal << endl;
 }
 
 VOID recordRWIns(CHAR *prefix, ADDRINT ptr, UINT32 size, CHAR *regName, ADDRINT regVal, int fileIdx)
@@ -236,13 +236,13 @@ VOID Instruction(INS ins, VOID *v)
             // TODO: add to map
             ADDRINT instAddr = INS_Address(ins);
             readStashMap[instAddr] = new ReadStash;
-            // char *strBuf0 = (char*)malloc(16);
-            strcpy(strBuf0, REG_StringShort(reg).c_str());
+            char *regName0 = (char*)malloc(8);
+            strcpy(regName0, REG_StringShort(reg).c_str());
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)stashReadIns,
                            IARG_PTR, "r >",
                            IARG_MEMORYREAD_EA,
                            IARG_MEMORYREAD_SIZE,
-                           IARG_PTR, strBuf0,
+                           IARG_PTR, regName0,
                            IARG_UINT32, fileIdx,
                            IARG_ADDRINT, instAddr,
                            IARG_END);
@@ -270,13 +270,14 @@ VOID Instruction(INS ins, VOID *v)
         {
             char *disasm = (char *)malloc(64);
             strcpy(disasm, INS_Disassemble(ins).c_str());
-            strcpy(strBuf1, REG_StringShort(reg).c_str());
+            char *regName1 = (char *)malloc(8);
+            strcpy(regName1, REG_StringShort(reg).c_str());
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordWriteIns, //recordRWIns,
                            IARG_PTR,
                            "w <",
                            IARG_MEMORYWRITE_EA,
                            IARG_MEMORYWRITE_SIZE,
-                           IARG_PTR, strBuf1,
+                           IARG_PTR, regName1,
                            IARG_REG_VALUE, reg,
                            IARG_UINT32, fileIdx,
                            IARG_PTR, disasm,
@@ -284,7 +285,7 @@ VOID Instruction(INS ins, VOID *v)
         }
         else if (INS_IsMov(ins))
         {
-            // TODO: 不输出寄存器，单输出反汇编
+            // TODO: 不输出寄存器，但是输出反汇编
             char *disasm = (char *)malloc(64);
             strcpy(disasm, INS_Disassemble(ins).c_str());
             // strcpy(strBuf1, REG_StringShort(reg).c_str());
@@ -318,16 +319,16 @@ VOID Instruction(INS ins, VOID *v)
         REG reg1 = INS_OperandReg(ins, 1);
         if (REG_valid(reg0) && REG_valid(reg1))
         {
-            char *buf0 = (char *)malloc(16);
-            char *buf1 = (char *)malloc(16);
+            char *buf0 = (char *)malloc(8);
+            char *buf1 = (char *)malloc(8);
             // strcpy(movReg0, REG_StringShort(reg0).c_str());
             // strcpy(movReg1, REG_StringShort(reg1).c_str());
             strcpy(buf0, REG_StringShort(reg0).c_str());
             strcpy(buf1, REG_StringShort(reg1).c_str());
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordMovIns,
-                           IARG_PTR, "m @",
+                           IARG_PTR, "m <",
                            IARG_PTR, buf0,
-                           IARG_UINT32, 0,
+                           //    IARG_UINT32, 0,
                            IARG_PTR, buf1,
                            IARG_REG_VALUE, reg1,
                            IARG_UINT32, fileIdx,
@@ -363,10 +364,10 @@ VOID Instruction(INS ins, VOID *v)
         REG reg = INS_OperandReg(ins, 0);
         if (REG_valid(reg))
         {
-            // char *strBuf0 = (char*)malloc(16);
-            strcpy(callReg, REG_StringShort(reg).c_str());
+            char *regName = (char*)malloc(16);
+            strcpy(regName, REG_StringShort(reg).c_str());
             INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)recordCallIns,
-                           IARG_PTR, callReg,
+                           IARG_PTR, regName,
                            IARG_REG_VALUE, reg,
                            IARG_UINT32, fileIdx,
                            IARG_END);
